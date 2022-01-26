@@ -1,15 +1,17 @@
 package main
 
-import "fmt"
-import "os"
-import "bufio"
+import (
+	"bufio"
+	"fmt"
+	"os"
+)
 
 type Stack struct {
 	data []int
 }
 
-func NewStack() Stack {
-	return Stack{data: []int{}}
+func NewStack(v int) Stack {
+	return Stack{data: []int{v}}
 }
 
 func (s *Stack) Push(v int) {
@@ -17,8 +19,7 @@ func (s *Stack) Push(v int) {
 }
 
 func (s *Stack) Peek() int {
-	l := len(s.data)
-	return s.data[l-1]
+	return s.data[len(s.data)-1]
 }
 
 func (s *Stack) IsEmpty() bool {
@@ -29,44 +30,23 @@ type Terminal struct {
 	stacks []Stack
 }
 
-const TerminalSize = 27
-
 func NewTerminal() Terminal {
-	stacks := make([]Stack, TerminalSize)
-
-	for i := 0; i < TerminalSize; i++ {
-		stacks[i] = NewStack()
-	}
-
-	return Terminal{stacks: stacks}
+	return Terminal{stacks: []Stack{}}
 }
 
 func (t *Terminal) Push(v int) {
-	if !t.stacks[v].IsEmpty() {
-		t.stacks[v].Push(v)
-		return
-	}
-
-	for i := v + 1; i < TerminalSize; i++ {
-		if !t.stacks[i].IsEmpty() {
+	for i := 0; i < len(t.stacks); i++ {
+		if t.stacks[i].Peek() >= v {
 			t.stacks[i].Push(v)
-			t.stacks[v] = t.stacks[i]
-			t.stacks[i] = NewStack()
 			return
 		}
 	}
 
-	t.stacks[v].Push(v)
+	t.stacks = append(t.stacks, NewStack(v))
 }
 
-func (t *Terminal) Count() int {
-	c := 0
-	for i := 0; i < TerminalSize; i++ {
-		if !t.stacks[i].IsEmpty() {
-			c++
-		}
-	}
-	return c
+func (t *Terminal) Len() int {
+	return len(t.stacks)
 }
 
 func main() {
@@ -93,5 +73,5 @@ func solve(line string) int {
 		t.Push(int(char - 'A'))
 	}
 
-	return t.Count()
+	return t.Len()
 }
