@@ -3,7 +3,6 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"math"
 	"os"
 )
 
@@ -16,7 +15,7 @@ func NewShip(len int, r string) Ship {
 
 	for i := 0; i < len; i++ {
 		id := rune(r[i])
-		rooms[id] = &Room{id: id}
+		rooms[id] = &Room{ID: id}
 	}
 
 	for i := 0; i < len; i++ {
@@ -39,21 +38,15 @@ func NewShip(len int, r string) Ship {
 }
 
 func (s *Ship) Distance(from rune, to rune) int {
-	if from == to {
-		return 0
+	distance := 0
+	forward := from
+	backward := from
+	for forward != to && backward != to {
+		distance++
+		forward = s.rooms[forward].Next.ID
+		backward = s.rooms[backward].Prev.ID
 	}
-
-	forward := 0
-	for curr := from; curr != to; curr = s.rooms[curr].Next.id {
-		forward++
-	}
-
-	backward := 0
-	for curr := from; curr != to; curr = s.rooms[curr].Prev.id {
-		backward++
-	}
-
-	return int(math.Min(float64(forward), float64(backward)))
+	return distance
 }
 
 func (s *Ship) IsSus(record string) bool {
@@ -89,7 +82,7 @@ func (s *Ship) isSus(record string, from int) bool {
 }
 
 type Room struct {
-	id   rune
+	ID   rune
 	Prev *Room
 	Next *Room
 }
